@@ -1,94 +1,95 @@
-// Register
-const registerForm = document.getElementById('registerForm');
-if (registerForm) {
-    registerForm.addEventListener('submit', async e => {
-        e.preventDefault();
-        const username = registerForm.username.value;
-        const password = registerForm.password.value;
-
-        try {
-            const res = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const text = await res.text();
-            alert(text);
-            if (text === 'User registered successfully!') {
-                window.location.href = 'login.html';
-            }
-        } catch (err) {
-            alert('Error: ' + err);
-        }
-    });
-}
-
-// Login
+// Example: Login functionality
 const loginForm = document.getElementById('loginForm');
-if (loginForm) {
-    loginForm.addEventListener('submit', async e => {
-        e.preventDefault();
-        const username = loginForm.username.value;
-        const password = loginForm.password.value;
 
-        try {
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const text = await res.text();
-            alert(text);
-            if (text === 'Login successful!') {
-                window.location.href = 'index.html';
-            }
-        } catch (err) {
-            alert('Error: ' + err);
-        }
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  try {
+    const res = await fetch('/auth/login', {  // <- relative path
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
     });
-}
 
-// Create post
-const postForm = document.getElementById('postForm');
-if (postForm) {
-    postForm.addEventListener('submit', async e => {
-        e.preventDefault();
-        const username = postForm.username.value;
-        const content = postForm.content.value;
+    const data = await res.json();
 
-        try {
-            const res = await fetch('/api/posts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, content })
-            });
-            const text = await res.text();
-            alert(text);
-            postForm.content.value = '';
-            loadPosts();
-        } catch (err) {
-            alert('Error: ' + err);
-        }
-    });
-}
-
-// Load posts
-async function loadPosts() {
-    const feed = document.getElementById('feed');
-    if (!feed) return;
-    try {
-        const res = await fetch('/api/posts');
-        const posts = await res.json();
-        feed.innerHTML = '';
-        posts.forEach(post => {
-            const li = document.createElement('li');
-            li.textContent = `${post.username}: ${post.content}`;
-            feed.appendChild(li);
-        });
-    } catch (err) {
-        console.error(err);
+    if (res.ok) {
+      alert('Login successful');
+      // Redirect or update UI
+    } else {
+      alert(data.message || 'Login failed');
     }
+  } catch (err) {
+    console.error(err);
+    alert('An error occurred');
+  }
+});
+
+// Example: Register functionality
+const registerForm = document.getElementById('registerForm');
+
+if (registerForm) {
+  registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const res = await fetch('/auth/register', { // <- relative path
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert('Registration successful');
+        // Redirect to login page or UI update
+      } else {
+        alert(data.message || 'Registration failed');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('An error occurred');
+    }
+  });
 }
 
-// Load posts on index page
-loadPosts();
+// Example: Create a new post
+const postForm = document.getElementById('postForm');
+
+if (postForm) {
+  postForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const content = document.getElementById('postContent').value;
+
+    try {
+      const res = await fetch('/post/create', {  // <- relative path
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert('Post created!');
+        // Update posts list dynamically
+      } else {
+        alert(data.message || 'Failed to create post');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('An error occurred');
+    }
+  });
+}
